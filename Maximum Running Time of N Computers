@@ -1,18 +1,26 @@
 class Solution {
-    public long maxRunTime(int n, int[] batteries) {
-        long totalEnergy = 0;
-        for (int battery : batteries) {
-            totalEnergy += battery;
+    public long maxRunTime(int n, int[] arr) {
+        long l = 1;
+        long h = 0;
+        for(int a : arr){
+            h += a;
         }
-        Arrays.sort(batteries);
-        for (int i = batteries.length - 1; i >= 0; i--) {
-            if (batteries[i] > totalEnergy / n) {
-                totalEnergy -= batteries[i];
-                n--;
-            } else {
-                break;
+        h = (h/n);
+        long mid;
+        long ans = 0;
+        while(l<=h){
+            mid = l + (h-l)/2;
+            long p = 0;
+            for(int a:arr){
+                p += Math.min((long)a,mid);
+            }
+            if(p >= mid*n){
+                l = mid+1;
+                ans = Math.max(ans,mid);
+            }else{
+                h = mid-1;
             }
         }
-        return totalEnergy / n;
+        return ans;
     }
 }
