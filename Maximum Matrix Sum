@@ -1,0 +1,24 @@
+class Solution {
+    public long maxMatrixSum(int[][] matrix) {
+        long sum = 0;
+        int minVal = Integer.MAX_VALUE, negCount = 0, zeroCount = 0;
+        for (int[] row : matrix) {
+            for (int cell : row) {
+                if (cell < 0) {
+                    sum = sum - cell;
+                    negCount++;
+                    minVal = Math.min(minVal, -cell);
+                } else if (cell == 0) {
+                    zeroCount++;
+                    minVal = Math.min(minVal, 0);
+                } else {
+                    sum += cell;
+                    minVal = Math.min(minVal, cell);
+                }
+            }
+        }
+        if (zeroCount != 0 || negCount % 2 == 0)
+            return sum;
+        return sum - 2*minVal;
+    }
+}
