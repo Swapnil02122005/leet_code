@@ -1,0 +1,67 @@
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+        // convert 2d to 1d
+        int n=matrix.length; // row
+        int m=matrix[0].length; // col
+        int[] h1= new int[m];
+        for (int j=0;j<m;j++){
+            h1[j]=(matrix[0][j]-'0');
+        }
+        int mah=largestRectangleArea(h1)
+        for (int i=1;i<n;i++){
+            for (int j=0;j<m;j++){
+                if (matrix[i][j]=='0'){
+                    h1[j]=0;
+                }
+                else{
+                    h1[j]=h1[j]+1;
+                }
+            }
+            mah=Math.max(mah,largestRectangleArea(h1));
+        }
+       return mah;        
+    }
+    public int largestRectangleArea(int[] arr) {
+        // find the nearest smallest index to left , nsl
+        int n=arr.length;
+        ArrayList<Integer> left=new ArrayList<>(n);
+        ArrayList<Integer> right=new ArrayList<>(n);
+        ArrayDeque< int[]> s =new ArrayDeque<>();
+        for (int i=0;i<n;i++){
+            while(!s.isEmpty() && s.peek()[0] >=arr[i]){
+                s.pop();
+            }
+            if (s.isEmpty()) left.add(-1);
+
+            
+            else{
+                left.add(s.peek()[1]);
+            }
+            s.push(new int[]{arr[i], i});
+        }
+        s.clear();
+
+        // find nsr
+        for (int i=n-1;i>=0;i--){
+            while(!s.isEmpty() && s.peek()[0] >=arr[i]){
+                s.pop();
+            }
+            if (s.isEmpty()) right.add(n);
+            else{
+                right.add(s.peek()[1]);
+            }
+            s.push(new int[]{arr[i], i});
+        }
+        Collections.reverse(right);
+
+        // store all the possible areas
+        long max = 0;
+        for (int i = 0; i < n; i++) {
+            long width = right.get(i) - left.get(i) - 1;
+            long area = (long) arr[i] * width;
+            max = Math.max(max, area);
+        }
+
+        return (int)max;
+    }
+};
