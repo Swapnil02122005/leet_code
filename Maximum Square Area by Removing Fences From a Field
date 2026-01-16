@@ -1,0 +1,42 @@
+class Solution {
+    private static int MOD = 1000000007;
+
+    public int maximizeSquareArea(int m, int n, int[] hFences, int[] vFences) {
+        // h=[2,3,4] v=[2,3]
+
+        final Set<Integer> hf = new HashSet<>();
+        Arrays.sort(hFences);
+
+        hf.add(m - 1);
+        for (int i=0;i<hFences.length;i++) {
+            hf.add(m - hFences[i]);
+            hf.add(hFences[i] - 1);
+
+            for (int j=i+1;j<hFences.length;j++) {
+                hf.add(hFences[j] - hFences[i]);
+            }
+        }
+
+        if (hf.contains(n - 1)) return (int)(((long)(n - 1) * (long)(n - 1)) % MOD);
+
+        Arrays.sort(vFences);
+        long maxArea = -1;
+
+        for (int i=0;i<vFences.length;i++) {
+            if (hf.contains(n - vFences[i])) {
+                maxArea = Math.max(maxArea, (long)(n - vFences[i]) * (long)(n - vFences[i]));
+            }
+            if (hf.contains(vFences[i] - 1)) {
+                maxArea = Math.max(maxArea, (long)(vFences[i] - 1) * (long)(vFences[i] - 1));
+            }
+
+            for (int j=i+1;j<vFences.length;j++) {
+                if (hf.contains(vFences[j] - vFences[i])) {
+                    maxArea = Math.max(maxArea, (long)(vFences[j] - vFences[i]) * (long)(vFences[j] - vFences[i]));
+                }
+            }
+        }
+
+        return (int)(maxArea % MOD);
+    }
+}
