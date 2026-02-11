@@ -1,0 +1,165 @@
+import java.util.*;
+
+class Solution {
+    
+    // Inner Segment Tree Class
+    private static class SegmentTree {
+        int[] treeMin;
+        int[] treeMax;
+        int[] lazy;
+        int n;
+
+        public SegmentTree(int n) {
+            this.n = n;
+            this.treeMin = new int[4 * n];
+            this.treeMax = new int[4 * n];
+            this.lazy = new int[4 * n];
+        }
+
+        public void build(int[] data, int node, int start, int end) {
+            if (start == end) {
+                treeMin[node] = data[start];
+                treeMax[node] = data[start];
+            } else {
+                int mid = (start + end) / 2;
+                build(data, 2 * node, start, mid);
+                build(data, 2 * node + 1, mid + 1, end);
+                treeMin[node] = Math.min(treeMin[2 * node], treeMin[2 * node + 1]);
+                treeMax[node] = Math.max(treeMax[2 * node], treeMax[2 * node + 1]);
+            }
+        }
+
+        private void push(int node) {
+            if (lazy[node] != 0) {
+                int lz = lazy[node];
+                
+                treeMin[2 * node] += lz;
+                treeMax[2 * node] += lz;
+                lazy[2 * node] += lz;
+
+                treeMin[2 * node + 1] += lz;
+                treeMax[2 * node + 1] += lz;
+                lazy[2 * node + 1] += lz;
+
+                lazy[node] = 0;
+            }
+        }
+
+        public void update(int node, int start, int end, int l, int r, int val) {
+            if (l > end || r < start) {
+                return;
+            }
+
+            if (l <= start && end <= r) {
+                treeMin[node] += val;
+                treeMax[node] += val;
+                lazy[node] += val;
+                return;
+            }
+
+            push(node);
+            int mid = (start + end) / 2;
+            update(2 * node, start, mid, l, r, val);
+            update(2 * node + 1, mid + 1, end, l, r, val);
+
+            treeMin[node] = Math.min(treeMin[2 * node], treeMin[2 * node + 1]);
+            treeMax[node] = Math.max(treeMax[2 * node], treeMax[2 * node + 1]);
+        }
+
+        public int findLastZero(int node, int start, int end, int minIdx) {
+            if (end < minIdx) {
+                return -1;
+            }
+
+            if (treeMin[node] > 0 || treeMax[node] < 0) {
+                return -1;
+            }
+
+            if (start == end) {
+                return (treeMin[node] == 0) ? start : -1;
+            }
+
+            push(node);
+            int mid = (start + end) / 2;
+
+            // Try right first
+            int res = findLastZero(2 * node + 1, mid + 1, end, minIdx);
+            if (res != -1) {
+                return res;
+            }
+
+            return findLastZero(2 * node, start, mid, minIdx);
+        }
+    }
+
+    public int longestBalanced(int[] nums) {
+        int n = nums.length;
+        if (n == 0) return 0;
+
+        // 1. Fast check
+        Set<Integer> allE = new HashSet<>();
+        Set<Integer> allO = new HashSet<>();
+        for (int x : nums) {
+            if ((x & 1) != 0) allO.add(x);
+            else allE.add(x);
+        }
+
+        if (allE.size() == allO.size()) return n;
+        if (allE.isEmpty() || allO.isEmpty()) return 0;
+
+        // 2. Precompute Next Occurrence
+        int[] nextOcc = new int[n];
+        Arrays.fill(nextOcc, n);
+        Map<Integer, Integer> lastSeen = new HashMap<>();
+        
+        for (int i = n - 1; i >= 0; i--) {
+            if (lastSeen.containsKey(nums[i])) {
+                nextOcc[i] = lastSeen.get(nums[i]);
+            }
+            lastSeen.put(nums[i], i);
+        }
+
+        // 3. Initial Balance
+        int[] initialBalance = new int[n];
+        Set<Integer> currE = new HashSet<>();
+        Set<Integer> currO = new HashSet<>();
+        int bal = 0;
+
+        for (int i = 0; i < n; i++) {
+            int x = nums[i];
+            if ((x & 1) != 0) {
+                if (currO.add(x)) {
+                    bal--;
+                }
+            } else {
+                if (currE.add(x)) {
+                    bal++;
+                }
+            }
+            initialBalance[i] = bal;
+        }
+
+        // 4. Build Tree
+        SegmentTree st = new SegmentTree(n);
+        st.build(initialBalance, 1, 0, n - 1);
+
+        int maxLen = 0;
+        for (int l = 0; l < n; l++) {
+            int idx = st.findLastZero(1, 0, n - 1, l);
+            if (idx != -1) {
+                maxLen = Math.max(maxLen, idx - l + 1);
+            }
+
+            // Update
+            if (l < n - 1) {
+                int endRange = nextOcc[l] - 1;
+                if (endRange >= l + 1) {
+                    int delta = (nums[l] % 2 == 0) ? -1 : 1;
+                    st.update(1, 0, n - 1, l + 1, endRange, delta);
+                }
+            }
+        }
+
+        return maxLen;
+    }
+}
