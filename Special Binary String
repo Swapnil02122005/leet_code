@@ -1,0 +1,38 @@
+import java.util.*;
+
+class Solution {
+
+    public String makeLargestSpecial(String s) {
+        List<String> list = new ArrayList<>();
+        int count = 0;
+        int start = 0;
+
+        // Step 1: Split into special substrings
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '1') {
+                count++;
+            } else {
+                count--;
+            }
+
+            // when balanced
+            if (count == 0) {
+                // recursively solve inside part
+                String inner = makeLargestSpecial(s.substring(start + 1, i));
+                list.add("1" + inner + "0");
+                start = i + 1;
+            }
+        }
+
+        // Step 2: Sort in descending order
+        Collections.sort(list, Collections.reverseOrder());
+
+        // Step 3: Combine
+        StringBuilder result = new StringBuilder();
+        for (String str : list) {
+            result.append(str);
+        }
+
+        return result.toString();
+    }
+}
