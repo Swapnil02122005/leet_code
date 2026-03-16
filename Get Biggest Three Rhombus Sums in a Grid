@@ -1,0 +1,69 @@
+class Solution {
+
+    static int calc(int arr[][], int left, int right, int up, int down){
+        int sum = 0;
+        int c1 = (left+right)/2;
+        int c2 = c1;
+        boolean flag = true;
+        for(int i=up; i<=down; i++){
+            if(c1==c2) sum+=arr[i][c1];
+            else{
+                sum+=arr[i][c1]+arr[i][c2];
+            }
+
+            if(c1==left) flag = false;
+
+            if(flag==true){
+                c1 = c1-1;
+                c2 = c2+1;
+            }else{
+                c1 = c1+1;
+                c2 = c2-1;
+            }
+        }
+        return sum;
+    }
+    public int[] getBiggestThree(int[][] arr) {
+        int m = arr.length;
+        int n = arr[0].length;
+
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                int l = j;
+                int r = j;
+                int d = i;
+
+                while(l>=0 && r<=n-1 && d<=m-1){
+                    int sum = calc(arr,l,r,i,d);
+                    l=l-1;
+                    r=r+1;
+                    d=d+2;
+
+                    if(pq.size()<3){
+                        if(!pq.contains(sum)) pq.add(sum);
+                    }else{
+                        if(pq.peek()<sum && !pq.contains(sum)){
+                            pq.remove();
+                            pq.add(sum);
+                        } 
+                    }
+                }
+            }
+        }
+        if(pq.size()==1){
+            return new int[]{pq.peek()};
+        }else if(pq.size()==2){
+            int a = pq.remove();
+            int b = pq.remove();
+
+            return new int[]{b,a};
+        }else{
+            int a = pq.remove();
+            int b = pq.remove();
+            int c = pq.remove();
+
+            return new int[]{c,b,a};
+        }
+    }
+}
