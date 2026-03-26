@@ -1,0 +1,60 @@
+class Solution {
+    public boolean canPartitionGrid(int[][] grid) {
+        long sum = 0;
+        for (int[] row : grid) {
+            for (int val : row) {
+                sum += val;
+            }
+        }        
+        if (canPartition(grid, sum)) return true;
+        if (canPartition(reverse(grid), sum)) return true;
+        int[][] trans = transpose(grid);        
+        if (canPartition(trans, sum)) return true;
+        if (canPartition(reverse(trans), sum)) return true;   
+        return false;
+    }
+    private boolean canPartition(int[][] grid, long sum) {
+        int m = grid.length;
+        int n = grid[0].length;
+        long topSum = 0;        
+        boolean[] seen = new boolean[100001];        
+        for (int i = 0; i < m - 1; ++i) {
+            for (int j = 0; j < n; ++j) {
+                topSum += grid[i][j];
+                if (grid[i][j] <= 100000) {
+                    seen[grid[i][j]] = true;
+                }
+            }
+            long botSum = sum - topSum;
+            long diff = topSum - botSum;            
+            if (diff == 0) return true;            
+            if (diff == grid[0][0] || diff == grid[0][n - 1] || diff == grid[i][0]) {
+                return true;
+            }            
+            if (n > 1 && i > 0 && diff > 0 && diff <= 100000 && seen[(int) diff]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private int[][] transpose(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] res = new int[n][m];
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                res[j][i] = grid[i][j];
+            }
+        }
+        return res;
+    }
+    private int[][] reverse(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] res = new int[m][n];
+        for (int i = 0; i < m; ++i) {
+            res[i] = grid[m - 1 - i]; 
+        }
+        return res;
+    }
+}
