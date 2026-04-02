@@ -1,0 +1,28 @@
+class Solution {
+    public int maximumAmount(int[][] coins) {
+        int l=coins.length;
+        int m=coins[0].length;
+        int[][][] dp=new int[l][m][3];
+        dp[l-1][m-1][0]=coins[l-1][m-1];
+        dp[l-1][m-1][2]=-10001;
+        for(int i=l-2;i>=0;i--){
+            dp[i][m-1][0]=dp[i+1][m-1][0]+coins[i][m-1];
+            dp[i][m-1][1]=Math.max(dp[i+1][m-1][0],dp[i+1][m-1][1]+coins[i][m-1]);
+            dp[i][m-1][2]=Math.max(dp[i+1][m-1][1],dp[i+1][m-1][2]+coins[i][m-1]);
+            
+        }
+        for(int j=m-2;j>=0;j--){
+            dp[l-1][j][0]=dp[l-1][j+1][0]+coins[l-1][j];
+            dp[l-1][j][1]=Math.max(dp[l-1][j+1][0],dp[l-1][j+1][1]+coins[l-1][j]);
+            dp[l-1][j][2]=Math.max(dp[l-1][j+1][1],dp[l-1][j+1][2]+coins[l-1][j]);
+        }
+        for(int i=l-2;i>=0;i--){
+            for(int j=l-2;j>=0;j--){
+                dp[i][j][0]=Math.max(dp[i+1][j][0],dp[i][j+1][0])+coins[i][j];
+                dp[i][j][1]=Math.max(Math.max(dp[i+1][j][0],dp[i+1][j][1]+coins[i][j]),Math.max(dp[i][j+1][0],dp[i][j+1][1]+coins[i][j]));
+                dp[i][j][2]=Math.max(Math.max(dp[i+1][j][1],dp[i+1][j][2]+coins[i][j]),Math.max(dp[i][j+1][1],dp[i][j+1][2]+coins[i][j]));
+            }
+        }
+        return Math.max(dp[0][0][0],Math.max(dp[0][0][1],dp[0][0][2]));        
+    }
+}
