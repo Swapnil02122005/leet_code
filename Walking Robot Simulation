@@ -1,0 +1,35 @@
+class Solution {
+    static int[][] dirs = { {0,1}, {1,0}, {0,-1}, {-1,0} };
+
+    public int robotSim(int[] commands, int[][] obstacles) {
+        int dirIdx = 0;
+        int result = 0;
+
+        Set<Long> set = new HashSet<>();
+
+        for (int[] obs : obstacles ) {
+            set.add( ((long)obs[0] << 32L) | (obs[1]&0x7fffffff) );
+        }
+
+        int xx = 0;
+        int yy = 0;
+        int[] dir = dirs[dirIdx];
+        for ( int com : commands ) {
+            if ( com == -1 ) { dirIdx = (dirIdx + 1) % 4; dir = dirs[dirIdx]; }
+            else if ( com == -2 ) { dirIdx = (dirIdx + 3) % 4; dir = dirs[dirIdx]; }
+            else {
+                for ( int ii = 1; ii <= com; ii++ ) {
+                    xx += dir[0];
+                    yy += dir[1];
+                    if ( set.contains( ((long)xx<<32L) | (yy&0x7fffffff) ) ) {
+                        xx -= dir[0];
+                        yy -= dir[1];
+                        break;
+                    }
+                }
+                result = Math.max(result, xx*xx + yy*yy);
+            }
+        }
+        return result;
+    }
+}
