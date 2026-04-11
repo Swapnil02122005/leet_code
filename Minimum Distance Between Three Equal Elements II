@@ -1,0 +1,27 @@
+import java.util.*;
+
+class Solution {
+    public int minimumDistance(int[] nums) {
+        Map<Integer, int[]> map = new HashMap<>();
+        int min = Integer.MAX_VALUE;
+        
+        for (int i = 0; i < nums.length; i++) {
+            int num = nums[i];
+            
+            if (!map.containsKey(num)) {
+                map.put(num, new int[]{-1, -1}); 
+            }
+            
+            int[] last = map.get(num);
+            
+            if (last[0] != -1 && last[1] != -1) {
+                min = Math.min(min, 2 * (i - last[0]));
+            }
+            
+            last[0] = last[1];
+            last[1] = i;
+        }
+        
+        return min == Integer.MAX_VALUE ? -1 : min;
+    }
+}
