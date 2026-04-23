@@ -1,0 +1,24 @@
+class Solution {
+    public long[] distance(int[] nums) {
+        HashMap<Integer, long[]> HM = new HashMap<>(nums.length, 0.99f);
+        for (int i = 0; i < nums.length; i++) {
+            if (!HM.containsKey(nums[i])) {
+                HM.put(nums[i], new long[] { 0, 0, 1, i });
+            } else {
+                long[] arr = HM.get(nums[i]);
+                arr[2]++;
+                arr[3] += i;
+            }
+        }
+        long[] res = new long[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            long[] arr = HM.get(nums[i]);
+            arr[2]--;
+            arr[3] -= i;
+            res[i] = arr[3] - arr[1] + (arr[0] - arr[2]) * i;
+            arr[0]++;
+            arr[1] += i;
+        }
+        return res;
+    }
+}
