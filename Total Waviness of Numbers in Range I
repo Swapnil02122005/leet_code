@@ -1,0 +1,27 @@
+class Solution {
+    public int totalWaviness(int num1, int num2) {
+        if(num1 < 100 && num2 < 100) {
+            return 0;
+        }
+        int total = 0;
+        for(int i = num1; i <= num2; i++) {
+            int temp = i;
+            int[] numArray = new int[6];
+            int pos = 0;
+            while(temp > 9) {
+                int digit = temp % 10;
+                numArray[pos] = digit;
+                pos++;
+                temp = temp/10;
+            }
+            numArray[pos] = temp;
+            for(int j = 1; j < pos; j++) {
+                if( (numArray[j] > numArray[j-1] && numArray[j] > numArray[j+1]) ||
+                    (numArray[j] < numArray[j-1] && numArray[j] < numArray[j+1]) ) {
+                        total++;
+                    }
+            }
+        }
+        return total;
+    }
+}
