@@ -1,0 +1,76 @@
+class Solution {
+
+    String helper(String ans) {
+        int ptr = 0;
+
+        while (ptr < ans.length() && ans.charAt(ptr) == '0') {
+            ptr++;
+        }
+
+        ans = ans.substring(ptr);
+
+        ptr = ans.length() - 1;
+
+        while (ptr >= 0 && ans.charAt(ptr) == '0') {
+            ptr--;
+        }
+
+        ans = ans.substring(0, ptr + 1);
+
+        // System.out.println(ans);
+
+        return ans;
+
+    }
+
+    public String shortestBeautifulSubstring(String s, int k) {
+
+        String ans = "";
+
+        String temp = "";
+        int count = 0;
+        int start = 0;
+
+        for (int i = 0; i < s.length(); i++) {
+
+            if (s.charAt(i) == '1') {
+                count++;
+            }
+
+            while (count > k) {
+                if (s.charAt(start) == '1') {
+                    count--;
+                }
+                start++;
+            }
+
+            while (count == k) {
+                if (s.charAt(start) == '0') {
+                    start++;
+
+                } else {
+                    break;
+                }
+
+            }
+
+            if (count == k) {
+                temp = s.substring(start, i + 1);
+                String cleaned = helper(temp);
+
+                if (ans.equals("")) {
+                    ans = cleaned;
+                }
+
+                if ((cleaned.compareTo(ans) < 1 && cleaned.length() == ans.length())
+                        || cleaned.length() < ans.length()) {
+                    ans = cleaned;
+                }
+            }
+
+        }
+
+        return ans;
+
+    }
+}
